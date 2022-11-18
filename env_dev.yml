@@ -1,0 +1,6 @@
+env:
+  # 基本設定
+  TZ: Asia/Tokyo
+  ENV: dev
+  REGION: ap-northeast-1
+  LOG_LEVEL: DEBUG

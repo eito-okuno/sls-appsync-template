@@ -1,0 +1,29 @@
+Resources:
+  TaskTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: task_${opt:stage, self:custom.defaultStage}
+      # 請求モード（従量課金）の設定
+      BillingMode: PAY_PER_REQUEST
+      # Partition Key / Sort Keyの型を設定
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+        - AttributeName: status
+          AttributeType: S
+      # Partition Key / Sort Keyの種類を設定（HASH = Partition Key / RANGE = Sort Key）
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+        - AttributeName: status
+          KeyType: RANGE
+      # ポイントインタイムリカバリ（バックアップ）の設定
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+
+Outputs:
+  DynamoDBTaskTable:
+    Value: !Ref TaskTable
+    Export:
+      Name: !Sub "${AWS::StackName}-DynamoDBTaskTable"
+  

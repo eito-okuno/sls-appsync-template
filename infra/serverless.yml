@@ -1,0 +1,38 @@
+service: ${file(../serverless-common.yml):appname}-infra
+
+frameworkVersion: '3'
+
+# プラグイン設定
+plugins:
+  - serverless-prune-plugin
+
+# 基本設定
+provider:
+  name: aws
+  region: ${file(../serverless-common.yml):region}
+  runtime: ${file(../serverless-common.yml):runtime}
+  stage: ${opt:stage, self:custom.defaultStage}
+  profile: ${file(../serverless-common.yml):profile.${opt:stage, self:custom.defaultStage}}
+  stackName: ${self:service}-${opt:stage, self:custom.defaultStage}
+  timeout: ${file(../serverless-common.yml):timeout.${opt:stage, self:custom.defaultStage}}
+  memorySize: ${file(../serverless-common.yml):memorySize.${opt:stage, self:custom.defaultStage}}
+  logRetentionInDays: ${file(../serverless-common.yml):logRetentionInDays.${opt:stage, self:custom.defaultStage}}
+  deploymentBucket: ${self:provider.stackName}-deployment-bucket
+  lambdaHashingVersion: '20201221'
+  stackTags:
+    ENV: ${opt:stage, self:custom.defaultStage}
+
+# カスタム設定
+custom:
+  # prune pluginの設定
+  prune:
+    automatic: true
+    number: 5
+  # 定数の定義
+  defaultStage: dev
+
+# AWSリソース設定
+resources:
+  - ${file(./resources/dynamodb/task_table.yml)}
+  - ${file(./resources/iam/appsync_logging_service_role.yml)}
+  - ${file(./resources/iam/appsync_dynamodb_service_role.yml)}

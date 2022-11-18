@@ -1,0 +1,46 @@
+Resources:
+  AppSyncRDSServiceRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: appsync-rds-service-role
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: 'Allow'
+            Principal:
+              Service:
+                - 'appsync.amazonaws.com'
+            Action:
+               - 'sts:AssumeRole'
+      Description: 'IAM Role of AppSync using RDS'
+      # IAMポリシーの定義
+      Policies:
+        - PolicyName: rds_policy_${opt:stage, self:custom.defaultStage}
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: 'Allow'
+                Action:
+                  - 'rds-data:DeleteItems'
+                  - 'rds-data:ExecuteSql'
+                  - 'rds-data:ExecuteStatement'
+                  - 'rds-data:GetItems'
+                  - 'rds-data:InsertItems'
+                  - 'rds-data:UpdateItems'
+                Resource:
+                  - '*'
+              - Effect: 'Allow'
+                Action:
+                  - 'secretsmanager:GetSecretValue'
+                Resource:
+                  - '*'
+      Tags:
+        - Key: Project
+          Value: ${file(../serverless-common.yml):appname}
+        - Key: Environment
+          Value: ${opt:stage, self:custom.defaultStage}
+
+Outputs:
+  AppSyncRDSServiceRoleArn:
+    Value: !GetAtt AppSyncRDSServiceRole.Arn
+

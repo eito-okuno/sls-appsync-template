@@ -1,0 +1,44 @@
+Resources:
+  AppSyncDynamoDBServiceRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: appsync-dynamodb-service-role
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: 'Allow'
+            Principal:
+              Service:
+                - 'appsync.amazonaws.com'
+            Action:
+               - 'sts:AssumeRole'
+      Description: 'IAM Role of AppSync using DynamoDB'
+      # IAMポリシーの定義
+      Policies:
+        - PolicyName: dynamo_policy_${opt:stage, self:custom.defaultStage}
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: 'Allow'
+                Action:
+                  - 'dynamodb:Query'
+                  - 'dynamodb:BatchWriteItem'
+                  - 'dynamodb:GetItem'
+                  - 'dynamodb:DeleteItem'
+                  - 'dynamodb:PutItem'
+                  - 'dynamodb:Scan'
+                  - 'dynamodb:UpdateItem'
+                Resource:
+                  - '*'
+      Tags:
+        - Key: Project
+          Value: ${file(../serverless-common.yml):appname}
+        - Key: Environment
+          Value: ${opt:stage, self:custom.defaultStage}
+
+Outputs:
+  AppSyncDynamoDBServiceRoleArn:
+    Value: !GetAtt AppSyncDynamoDBServiceRole.Arn
+    Export:
+      Name: !Sub "${AWS::StackName}-AppSyncDynamoDBServiceRoleArn"
+
