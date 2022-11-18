@@ -1,0 +1,4 @@
+stage: 'api'
+apiKeys:
+  - name: ${self:custom.appname}-api-key-${opt:stage, self:custom.defaultStage}}
+    value: ${file(../serverless-common.yml):apiKeyValue.${opt:stage, self:custom.defaultStage}}

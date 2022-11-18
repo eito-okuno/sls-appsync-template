@@ -1,0 +1,6 @@
+securityGroupIds:
+  - ${file(../serverless-common.yml):lambdaSecurityGroupId.${opt:stage, self:custom.defaultStage}}
+subnetIds:
+  - ${file(../serverless-common.yml):privateSubnetAId.${opt:stage, self:custom.defaultStage}}
+  - ${file(../serverless-common.yml):privateSubnetCId.${opt:stage, self:custom.defaultStage}}
+  - ${file(../serverless-common.yml):privateSubnetDId.${opt:stage, self:custom.defaultStage}}

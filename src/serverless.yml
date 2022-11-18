@@ -1,0 +1,50 @@
+service: ${file(../serverless-common.yml):appname}-src
+
+frameworkVersion: '3'
+
+# プラグイン設定
+plugins:
+  - serverless-prune-plugin
+  - serverless-appsync-plugin
+
+# 基本設定
+provider:
+  name: aws
+  region: ${file(../serverless-common.yml):region}
+  runtime: ${file(../serverless-common.yml):runtime}
+  architecture: ${file(../serverless-common.yml):architecture}
+  stage: ${opt:stage, self:custom.defaultStage}
+  profile: ${file(../serverless-common.yml):profile.${opt:stage, self:custom.defaultStage}}
+  stackName: ${self:service}-${opt:stage, self:custom.defaultStage}
+  apiName: ${self:service}-${opt:stage, self:custom.defaultStage}
+  timeout: ${file(../serverless-common.yml):timeout.${opt:stage, self:custom.defaultStage}}
+  memorySize: ${file(../serverless-common.yml):memorySize.${opt:stage, self:custom.defaultStage}}
+  logRetentionInDays: ${file(../serverless-common.yml):logRetentionInDays.${opt:stage, self:custom.defaultStage}}
+  deploymentBucket: ${self:provider.stackName}-deployment-bucket
+  environment: ${self:custom.environment.env}
+  stackTags:
+    ENV: ${opt:stage, self:custom.defaultStage}
+  lambdaHashingVersion: '20201221'
+#   apiGateway: ${file(./provider/apigw.yml)}
+#   vpc: ${file(./provider/vpc.yml)}
+
+# カスタム設定
+custom:
+  # 定数の定義
+  appname: ${file(../serverless-common.yml):appname}
+  infraStackName: ${self:custom.appname}-infra-${opt:stage, self:custom.defaultStage}
+  defaultStage: dev
+  environment: ${file(../env_${opt:stage, self:custom.defaultStage}.yml)}
+  # prune-pluginの設定
+  prune: ${file(./custom/prune.yml)}
+  # appsync-pluginの設定
+  appSync: ${file(./custom/appsync.yml)}
+  # lambda layerの設定
+#   layers: ${file(./custom/lambda_layers.yml)}
+
+# lambdaの設定
+# functions: ${file(./resources/functions.yml)}
+
+# AWSリソース設定
+# resources:
+#   - ${file(./resources/apigw_response.yml)}
